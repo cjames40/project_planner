@@ -15,7 +15,7 @@ export async function initializeDatabase(): Promise<DrizzleSqlJsDb<typeof schema
   if (db) return db
 
   const SQL = await initSqlJs({
-    locateFile: (file) => `https://sql.js.org/dist/${file}`,
+    locateFile: () => '/sql-wasm.wasm',
   })
 
   // Try to restore from localStorage
