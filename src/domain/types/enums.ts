@@ -68,3 +68,56 @@ export const RISK_CATEGORY_LABELS: Record<RiskCategory, string> = {
   vendor: 'Vendor',
   architectural: 'Architectural',
 }
+
+export const IN_SCOPE_CATEGORY_LABELS: Record<InScopeCategory, string> = {
+  functional: 'Functional',
+  data: 'Data',
+  integration: 'Integration',
+  infrastructure: 'Infrastructure',
+  process: 'Process',
+  security: 'Security',
+  other: 'Other',
+}
+
+export const CONSTRAINT_TYPE_LABELS: Record<ConstraintType, string> = {
+  technical: 'Technical',
+  business: 'Business',
+  regulatory: 'Regulatory',
+  resource: 'Resource',
+  time: 'Time',
+}
+
+export const STAKEHOLDER_TYPE_LABELS: Record<StakeholderType, string> = {
+  sponsor: 'Sponsor',
+  'decision-maker': 'Decision Maker',
+  'subject-matter-expert': 'SME',
+  'end-user': 'End User',
+  'impacted-party': 'Impacted Party',
+  regulator: 'Regulator',
+}
+
+export const CRITICALITY_LABELS: Record<Criticality, string> = {
+  critical: 'Critical',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+}
+
+export const INTEGRATION_DIRECTION_LABELS: Record<IntegrationDirection, string> = {
+  inbound: 'Inbound',
+  outbound: 'Outbound',
+  bidirectional: 'Bidirectional',
+}
+
+export const INTEGRATION_POINT_STATUS_LABELS: Record<IntegrationPointStatus, string> = {
+  confirmed: 'Confirmed',
+  assumed: 'Assumed',
+  tbd: 'TBD',
+}
+
+export const DATA_CLASSIFICATION_LABELS: Record<DataClassification, string> = {
+  public: 'Public',
+  internal: 'Internal',
+  confidential: 'Confidential',
+  restricted: 'Restricted',
+}

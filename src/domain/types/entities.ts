@@ -2,6 +2,8 @@ import type {
   ProjectType, ProjectStatus, CreatedVia,
   RiskCategory, RiskLikelihood, RiskImpact, RiskStatus, MitigationStatus,
   MessageRole, ExtractionStatus, ElementType,
+  InScopeCategory, ConstraintType, StakeholderType, InfluenceLevel, InterestLevel,
+  IntegrationDirection, DataClassification, Criticality, IntegrationPointStatus,
 } from './enums'
 
 // --- Base fields shared by most entities ---
@@ -85,6 +87,171 @@ export interface UpdateScopeInput {
   problemStatement?: string
   solutionSummary?: string
   assumptions?: string[]
+}
+
+// --- InScopeItem ---
+
+export interface InScopeItem extends BaseEntity {
+  scopeId: string
+  description: string
+  rationale: string
+  category: InScopeCategory | ''
+}
+
+export interface CreateInScopeItemInput {
+  description: string
+  rationale?: string
+  category?: InScopeCategory
+  createdVia: CreatedVia
+}
+
+export interface UpdateInScopeItemInput {
+  description?: string
+  rationale?: string
+  category?: InScopeCategory
+}
+
+// --- OutOfScopeItem ---
+
+export interface OutOfScopeItem extends BaseEntity {
+  scopeId: string
+  description: string
+  rationale: string
+  deferredTo: string
+}
+
+export interface CreateOutOfScopeItemInput {
+  description: string
+  rationale: string
+  deferredTo?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateOutOfScopeItemInput {
+  description?: string
+  rationale?: string
+  deferredTo?: string
+}
+
+// --- Stakeholder ---
+
+export interface Stakeholder extends BaseEntity {
+  scopeId: string
+  name: string
+  role: string
+  type: StakeholderType
+  primaryConcern: string
+  influenceLevel: InfluenceLevel
+  interestLevel: InterestLevel
+  communicationNeeds: string
+  linkedRiskIds: string[]
+  linkedConstraintIds: string[]
+  linkedADRIds: string[]
+  linkedOpportunityIds: string[]
+}
+
+export interface CreateStakeholderInput {
+  name: string
+  role: string
+  type: StakeholderType
+  primaryConcern: string
+  influenceLevel: InfluenceLevel
+  interestLevel: InterestLevel
+  communicationNeeds?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateStakeholderInput {
+  name?: string
+  role?: string
+  type?: StakeholderType
+  primaryConcern?: string
+  influenceLevel?: InfluenceLevel
+  interestLevel?: InterestLevel
+  communicationNeeds?: string
+  linkedRiskIds?: string[]
+  linkedConstraintIds?: string[]
+  linkedADRIds?: string[]
+  linkedOpportunityIds?: string[]
+}
+
+// --- IntegrationPoint ---
+
+export interface IntegrationPoint extends BaseEntity {
+  scopeId: string
+  systemName: string
+  direction: IntegrationDirection
+  protocol: string
+  dataClassification: DataClassification | ''
+  owner: string
+  sla: string
+  criticality: Criticality
+  description: string
+  status: IntegrationPointStatus
+  linkedRiskIds: string[]
+}
+
+export interface CreateIntegrationPointInput {
+  systemName: string
+  direction: IntegrationDirection
+  criticality: Criticality
+  description: string
+  status: IntegrationPointStatus
+  protocol?: string
+  dataClassification?: DataClassification
+  owner?: string
+  sla?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateIntegrationPointInput {
+  systemName?: string
+  direction?: IntegrationDirection
+  protocol?: string
+  dataClassification?: DataClassification
+  owner?: string
+  sla?: string
+  criticality?: Criticality
+  description?: string
+  status?: IntegrationPointStatus
+  linkedRiskIds?: string[]
+}
+
+// --- Constraint ---
+
+export interface Constraint extends BaseEntity {
+  scopeId: string
+  title: string
+  description: string
+  type: ConstraintType
+  source: string
+  isNegotiable: boolean
+  impact: string
+  linkedRiskIds: string[]
+  linkedADRIds: string[]
+  linkedStakeholderIds: string[]
+}
+
+export interface CreateConstraintInput {
+  title: string
+  description: string
+  type: ConstraintType
+  source: string
+  isNegotiable: boolean
+  impact: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateConstraintInput {
+  title?: string
+  description?: string
+  type?: ConstraintType
+  source?: string
+  isNegotiable?: boolean
+  impact?: string
+  linkedRiskIds?: string[]
+  linkedADRIds?: string[]
+  linkedStakeholderIds?: string[]
 }
 
 // --- Risk ---
@@ -182,3 +349,41 @@ export interface ProposedRisk {
   data: CreateRiskInput
   status: 'pending' | 'accepted' | 'rejected' | 'editing'
 }
+
+export interface ProposedInScopeItem {
+  type: 'in-scope-item'
+  data: CreateInScopeItemInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedOutOfScopeItem {
+  type: 'out-of-scope-item'
+  data: CreateOutOfScopeItemInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedStakeholder {
+  type: 'stakeholder'
+  data: CreateStakeholderInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedIntegrationPoint {
+  type: 'integration-point'
+  data: CreateIntegrationPointInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedConstraint {
+  type: 'constraint'
+  data: CreateConstraintInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export type ProposedElement =
+  | ProposedRisk
+  | ProposedInScopeItem
+  | ProposedOutOfScopeItem
+  | ProposedStakeholder
+  | ProposedIntegrationPoint
+  | ProposedConstraint

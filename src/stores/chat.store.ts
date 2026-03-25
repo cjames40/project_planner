@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ChatMessage, ProposedRisk, CreateRiskInput } from '@/domain/types'
+import type { ChatMessage, ProposedElement } from '@/domain/types'
 import { chatRepository } from '@/services/persistence'
 import { streamChatMessage } from '@/services/chat'
 import { usePlanStore } from './plan.store'
@@ -9,7 +9,7 @@ interface ChatState {
   sessionId: string | null
   isStreaming: boolean
   streamingContent: string
-  pendingProposals: ProposedRisk[]
+  pendingProposals: ProposedElement[]
   error: string | null
 
   initSession: (planId: string) => Promise<void>
@@ -39,14 +39,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     set({ error: null })
 
-    // Persist user message
     const userMsg = await chatRepository.appendMessage(sessionId, {
       role: 'user',
       content,
     })
     set((s) => ({ messages: [...s.messages, userMsg] }))
 
-    // Stream assistant response
     set({ isStreaming: true, streamingContent: '' })
 
     try {
@@ -55,7 +53,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         (chunk) => set((s) => ({ streamingContent: s.streamingContent + chunk })),
       )
 
-      // Persist assistant message
       const assistantMsg = await chatRepository.appendMessage(sessionId, {
         role: 'assistant',
         content: text,
@@ -82,12 +79,30 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!proposal || proposal.status !== 'pending') return
 
     const updated = [...pendingProposals]
-    updated[index] = { ...proposal, status: 'accepted' }
+    updated[index] = { ...proposal, status: 'accepted' } as ProposedElement
     set({ pendingProposals: updated })
 
-    // Add to plan store
     const planStore = usePlanStore.getState()
-    await planStore.addRisk(proposal.data)
+    switch (proposal.type) {
+      case 'risk':
+        await planStore.addRisk(proposal.data)
+        break
+      case 'in-scope-item':
+        await planStore.addInScopeItem(proposal.data)
+        break
+      case 'out-of-scope-item':
+        await planStore.addOutOfScopeItem(proposal.data)
+        break
+      case 'stakeholder':
+        await planStore.addStakeholder(proposal.data)
+        break
+      case 'integration-point':
+        await planStore.addIntegrationPoint(proposal.data)
+        break
+      case 'constraint':
+        await planStore.addConstraint(proposal.data)
+        break
+    }
   },
 
   rejectProposal(index) {
@@ -96,7 +111,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!proposal || proposal.status !== 'pending') return
 
     const updated = [...pendingProposals]
-    updated[index] = { ...proposal, status: 'rejected' }
+    updated[index] = { ...proposal, status: 'rejected' } as ProposedElement
     set({ pendingProposals: updated })
   },
 

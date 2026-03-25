@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateCompletenessScore, getCompletenessLabel, getCompletenessColor } from '../completeness/score'
+import { calculateCompletenessScore, getCompletenessLabel, getCompletenessColor, type CompletenessInput } from '../completeness/score'
 import type { Scope, Risk } from '../types'
 
 const makeScope = (problemStatement: string): Scope => ({
@@ -39,29 +39,78 @@ const makeRisk = (): Risk => ({
   updatedAt: '',
 })
 
+function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInput {
+  return {
+    scope: null,
+    risks: [],
+    inScopeItemCount: 0,
+    outOfScopeItemCount: 0,
+    stakeholderCount: 0,
+    integrationPointCount: 0,
+    constraintCount: 0,
+    ...overrides,
+  }
+}
+
 describe('calculateCompletenessScore', () => {
-  it('returns 0 for null scope and no risks', () => {
-    expect(calculateCompletenessScore(null, [])).toBe(0)
+  it('returns 0 for empty input', () => {
+    expect(calculateCompletenessScore(makeInput())).toBe(0)
   })
 
   it('returns 10 for problem statement only', () => {
-    expect(calculateCompletenessScore(makeScope('Problem'), [])).toBe(10)
+    expect(calculateCompletenessScore(makeInput({ scope: makeScope('Problem') }))).toBe(10)
   })
 
   it('returns 0 for empty problem statement', () => {
-    expect(calculateCompletenessScore(makeScope('  '), [])).toBe(0)
+    expect(calculateCompletenessScore(makeInput({ scope: makeScope('  ') }))).toBe(0)
   })
 
   it('returns 10 for 2+ risks only', () => {
-    expect(calculateCompletenessScore(null, [makeRisk(), makeRisk()])).toBe(10)
+    expect(calculateCompletenessScore(makeInput({ risks: [makeRisk(), makeRisk()] }))).toBe(10)
   })
 
   it('returns 0 for only 1 risk', () => {
-    expect(calculateCompletenessScore(null, [makeRisk()])).toBe(0)
+    expect(calculateCompletenessScore(makeInput({ risks: [makeRisk()] }))).toBe(0)
   })
 
-  it('returns 20 for both', () => {
-    expect(calculateCompletenessScore(makeScope('Problem'), [makeRisk(), makeRisk()])).toBe(20)
+  it('returns 5 for 3+ in-scope items', () => {
+    expect(calculateCompletenessScore(makeInput({ inScopeItemCount: 3 }))).toBe(5)
+  })
+
+  it('returns 0 for 2 in-scope items', () => {
+    expect(calculateCompletenessScore(makeInput({ inScopeItemCount: 2 }))).toBe(0)
+  })
+
+  it('returns 5 for 1+ out-of-scope items', () => {
+    expect(calculateCompletenessScore(makeInput({ outOfScopeItemCount: 1 }))).toBe(5)
+  })
+
+  it('returns 8 for 2+ stakeholders', () => {
+    expect(calculateCompletenessScore(makeInput({ stakeholderCount: 2 }))).toBe(8)
+  })
+
+  it('returns 0 for 1 stakeholder', () => {
+    expect(calculateCompletenessScore(makeInput({ stakeholderCount: 1 }))).toBe(0)
+  })
+
+  it('returns 5 for 1+ integration points', () => {
+    expect(calculateCompletenessScore(makeInput({ integrationPointCount: 1 }))).toBe(5)
+  })
+
+  it('returns 7 for 1+ constraints', () => {
+    expect(calculateCompletenessScore(makeInput({ constraintCount: 1 }))).toBe(7)
+  })
+
+  it('returns 50 for all criteria met', () => {
+    expect(calculateCompletenessScore(makeInput({
+      scope: makeScope('Problem'),
+      risks: [makeRisk(), makeRisk()],
+      inScopeItemCount: 3,
+      outOfScopeItemCount: 1,
+      stakeholderCount: 2,
+      integrationPointCount: 1,
+      constraintCount: 1,
+    }))).toBe(50)
   })
 })
 
@@ -69,6 +118,11 @@ describe('getCompletenessLabel', () => {
   it('returns Early Draft for low scores', () => {
     expect(getCompletenessLabel(0)).toBe('Early Draft')
     expect(getCompletenessLabel(39)).toBe('Early Draft')
+  })
+
+  it('returns In Progress for 40-69', () => {
+    expect(getCompletenessLabel(40)).toBe('In Progress')
+    expect(getCompletenessLabel(50)).toBe('In Progress')
   })
 
   it('returns Complete for 90+', () => {
@@ -79,6 +133,10 @@ describe('getCompletenessLabel', () => {
 describe('getCompletenessColor', () => {
   it('returns gray for low scores', () => {
     expect(getCompletenessColor(0)).toBe('gray')
+  })
+
+  it('returns amber for 40-69', () => {
+    expect(getCompletenessColor(50)).toBe('amber')
   })
 
   it('returns green for 90+', () => {

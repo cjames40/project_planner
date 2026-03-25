@@ -98,6 +98,102 @@ export async function initializeDatabase(): Promise<DrizzleSqlJsDb<typeof schema
   `)
 
   rawDb.run(`
+    CREATE TABLE IF NOT EXISTS in_scope_items (
+      id TEXT PRIMARY KEY,
+      scope_id TEXT NOT NULL,
+      description TEXT NOT NULL,
+      rationale TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT '',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS out_of_scope_items (
+      id TEXT PRIMARY KEY,
+      scope_id TEXT NOT NULL,
+      description TEXT NOT NULL,
+      rationale TEXT NOT NULL,
+      deferred_to TEXT NOT NULL DEFAULT '',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS stakeholders (
+      id TEXT PRIMARY KEY,
+      scope_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL,
+      type TEXT NOT NULL,
+      primary_concern TEXT NOT NULL,
+      influence_level TEXT NOT NULL,
+      interest_level TEXT NOT NULL,
+      communication_needs TEXT NOT NULL DEFAULT '',
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      linked_constraint_ids TEXT NOT NULL DEFAULT '[]',
+      linked_adr_ids TEXT NOT NULL DEFAULT '[]',
+      linked_opportunity_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS integration_points (
+      id TEXT PRIMARY KEY,
+      scope_id TEXT NOT NULL,
+      system_name TEXT NOT NULL,
+      direction TEXT NOT NULL,
+      protocol TEXT NOT NULL DEFAULT '',
+      data_classification TEXT NOT NULL DEFAULT '',
+      owner TEXT NOT NULL DEFAULT '',
+      sla TEXT NOT NULL DEFAULT '',
+      criticality TEXT NOT NULL,
+      description TEXT NOT NULL,
+      status TEXT NOT NULL,
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS constraints (
+      id TEXT PRIMARY KEY,
+      scope_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      type TEXT NOT NULL,
+      source TEXT NOT NULL,
+      is_negotiable TEXT NOT NULL,
+      impact TEXT NOT NULL,
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      linked_adr_ids TEXT NOT NULL DEFAULT '[]',
+      linked_stakeholder_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id TEXT PRIMARY KEY,
       plan_id TEXT NOT NULL,

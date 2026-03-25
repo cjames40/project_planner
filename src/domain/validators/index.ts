@@ -1,2 +1,7 @@
 export { validateCreateProject } from './project.validator'
 export { validateCreateRisk } from './risk.validator'
+export { validateCreateInScopeItem } from './in-scope-item.validator'
+export { validateCreateOutOfScopeItem } from './out-of-scope-item.validator'
+export { validateCreateStakeholder } from './stakeholder.validator'
+export { validateCreateIntegrationPoint } from './integration-point.validator'
+export { validateCreateConstraint } from './constraint.validator'

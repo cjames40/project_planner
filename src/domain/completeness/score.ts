@@ -3,23 +3,56 @@ import type { Scope, Risk } from '../types'
 export type CompletenessLabel = 'Early Draft' | 'In Progress' | 'Substantial' | 'Complete'
 export type CompletenessColor = 'gray' | 'amber' | 'blue' | 'green'
 
+export interface CompletenessInput {
+  scope: Scope | null
+  risks: Risk[]
+  inScopeItemCount: number
+  outOfScopeItemCount: number
+  stakeholderCount: number
+  integrationPointCount: number
+  constraintCount: number
+}
+
 /**
- * Simplified completeness score for the vertical slice.
- * Checks problemStatement (10pts) and risk count >= 2 (10pts).
- * Full 14-criterion scoring is tech debt.
+ * Completeness score (0–50 for scope+risk criteria).
+ * Remaining 50 comes from Approach/ADR tabs (not yet implemented).
  */
-export function calculateCompletenessScore(
-  scope: Scope | null,
-  risks: Risk[],
-): number {
+export function calculateCompletenessScore(input: CompletenessInput): number {
   let score = 0
 
-  if (scope && scope.problemStatement.trim().length > 0) {
+  // Problem statement: 10 pts
+  if (input.scope && input.scope.problemStatement.trim().length > 0) {
     score += 10
   }
 
-  if (risks.length >= 2) {
+  // Risks >= 2: 10 pts
+  if (input.risks.length >= 2) {
     score += 10
+  }
+
+  // In-scope items >= 3: 5 pts
+  if (input.inScopeItemCount >= 3) {
+    score += 5
+  }
+
+  // Out-of-scope items >= 1: 5 pts
+  if (input.outOfScopeItemCount >= 1) {
+    score += 5
+  }
+
+  // Stakeholders >= 2: 8 pts
+  if (input.stakeholderCount >= 2) {
+    score += 8
+  }
+
+  // Integration points >= 1: 5 pts
+  if (input.integrationPointCount >= 1) {
+    score += 5
+  }
+
+  // Constraints >= 1: 7 pts
+  if (input.constraintCount >= 1) {
+    score += 7
   }
 
   return score

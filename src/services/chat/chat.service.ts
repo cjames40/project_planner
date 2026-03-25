@@ -1,7 +1,10 @@
 import { streamText, tool } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
-import type { ChatMessage, ProposedRisk } from '@/domain/types'
-import { proposeRiskSchema } from './extraction-schema'
+import type { ChatMessage, ProposedElement } from '@/domain/types'
+import {
+  proposeRiskSchema, proposeInScopeItemSchema, proposeOutOfScopeItemSchema,
+  proposeStakeholderSchema, proposeIntegrationPointSchema, proposeConstraintSchema,
+} from './extraction-schema'
 import { buildSystemPrompt } from './system-prompt'
 import { useProjectStore } from '@/stores/project.store'
 import { usePlanStore } from '@/stores/plan.store'
@@ -29,7 +32,7 @@ export function setModel(model: string): void {
 export async function streamChatMessage(
   messages: ChatMessage[],
   onChunk: (chunk: string) => void,
-): Promise<{ text: string; proposals: ProposedRisk[] }> {
+): Promise<{ text: string; proposals: ProposedElement[] }> {
   const apiKey = getApiKey()
   if (!apiKey) {
     throw new Error('OpenAI API key not configured. Open Settings to add your key.')
@@ -51,7 +54,7 @@ export async function streamChatMessage(
     }
   }
 
-  const proposals: ProposedRisk[] = []
+  const proposals: ProposedElement[] = []
 
   const aiMessages = messages.map((m) => ({
     role: m.role as 'user' | 'assistant',
@@ -64,22 +67,55 @@ export async function streamChatMessage(
     messages: aiMessages,
     tools: {
       proposeRisk: tool({
-        description: 'Propose a risk that has been identified in the conversation. Use this when you identify a concrete, specific risk the project faces.',
+        description: 'Propose a risk that has been identified in the conversation.',
         parameters: proposeRiskSchema,
         execute: async (args) => {
-          proposals.push({
-            type: 'risk',
-            data: {
-              ...args,
-              createdVia: 'chat',
-            },
-            status: 'pending',
-          })
+          proposals.push({ type: 'risk', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
           return { success: true, message: `Risk proposed: ${args.title}` }
         },
       }),
+      proposeInScopeItem: tool({
+        description: 'Propose something that should be in scope for this project.',
+        parameters: proposeInScopeItemSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'in-scope-item', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `In-scope item proposed: ${args.description.slice(0, 50)}` }
+        },
+      }),
+      proposeOutOfScopeItem: tool({
+        description: 'Propose something that should be explicitly out of scope. Always provide a rationale.',
+        parameters: proposeOutOfScopeItemSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'out-of-scope-item', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Out-of-scope item proposed: ${args.description.slice(0, 50)}` }
+        },
+      }),
+      proposeStakeholder: tool({
+        description: 'Propose a stakeholder who should be tracked for this project.',
+        parameters: proposeStakeholderSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'stakeholder', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Stakeholder proposed: ${args.name}` }
+        },
+      }),
+      proposeIntegrationPoint: tool({
+        description: 'Propose an external system integration that the project depends on.',
+        parameters: proposeIntegrationPointSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'integration-point', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Integration point proposed: ${args.systemName}` }
+        },
+      }),
+      proposeConstraint: tool({
+        description: 'Propose a constraint that limits the solution space for this project.',
+        parameters: proposeConstraintSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'constraint', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Constraint proposed: ${args.title}` }
+        },
+      }),
     },
-    maxSteps: 3,
+    maxSteps: 5,
     abortSignal: AbortSignal.timeout(30000),
   })
 
