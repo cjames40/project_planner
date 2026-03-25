@@ -4,6 +4,8 @@ import { useProjectStore, usePlanStore, useChatStore, useUIStore } from '@/store
 import { validateCreateProject } from '@/domain/validators'
 import type { ProjectType, CreateProjectInput } from '@/domain/types'
 import { PROJECT_TYPE_LABELS } from '@/domain/types'
+import { getOnboardingMessage } from '@/services/chat'
+import { chatRepository } from '@/services/persistence'
 
 interface Props {
   open: boolean
@@ -44,10 +46,19 @@ export function NewProjectModal({ open, onClose }: Props) {
       const projectId = await createProject(input)
       await loadPlan(projectId)
 
-      // Init chat session for the new plan
+      // Init chat session and send onboarding message
       const plan = usePlanStore.getState().plan
       if (plan) {
         await initSession(plan.id)
+        const sessionId = useChatStore.getState().sessionId
+        if (sessionId) {
+          const onboardingMsg = getOnboardingMessage(name, projectType, description)
+          const msg = await chatRepository.appendMessage(sessionId, {
+            role: 'assistant',
+            content: onboardingMsg,
+          })
+          useChatStore.setState((s) => ({ messages: [...s.messages, msg] }))
+        }
       }
 
       setActiveTab('overview')
