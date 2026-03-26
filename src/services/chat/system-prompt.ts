@@ -15,6 +15,10 @@ Available tools — use them when you identify concrete elements:
 - **proposeStakeholder**: When a person or role is mentioned who has a stake in the project
 - **proposeIntegrationPoint**: When an external system dependency is identified
 - **proposeConstraint**: When a limitation on the solution space is identified
+- **proposePattern**: When an architectural pattern is relevant (e.g., CQRS, Saga, BFF, Event Sourcing)
+- **proposeTechChoice**: When a technology decision is made or recommended (language, framework, database, etc.)
+- **proposeNFR**: When a non-functional requirement is identified with a measurable target
+- **proposePrinciple**: When a design principle should guide decisions (e.g., API-First, eventual consistency)
 
 ${problemStatement ? `Current problem statement:\n${problemStatement}\n` : 'No problem statement defined yet. Help the user articulate what problem this project solves.'}
 

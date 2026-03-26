@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calculateCompletenessScore, getCompletenessLabel, getCompletenessColor, type CompletenessInput } from '../completeness/score'
-import type { Scope, Risk } from '../types'
+import type { Scope, Risk, Approach } from '../types'
 
 const makeScope = (problemStatement: string): Scope => ({
   id: '1',
@@ -39,6 +39,16 @@ const makeRisk = (): Risk => ({
   updatedAt: '',
 })
 
+const makeApproach = (style: Approach['architecturalStyle'] = 'microservices'): Approach => ({
+  id: '1',
+  planId: 'p1',
+  strategySummary: '',
+  architecturalStyle: style,
+  architecturalStyleRationale: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInput {
   return {
     scope: null,
@@ -48,6 +58,11 @@ function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInpu
     stakeholderCount: 0,
     integrationPointCount: 0,
     constraintCount: 0,
+    approach: null,
+    patternCount: 0,
+    techChoiceCount: 0,
+    nfrCount: 0,
+    principleCount: 0,
     ...overrides,
   }
 }
@@ -101,7 +116,36 @@ describe('calculateCompletenessScore', () => {
     expect(calculateCompletenessScore(makeInput({ constraintCount: 1 }))).toBe(7)
   })
 
-  it('returns 50 for all criteria met', () => {
+  // Approach criteria
+  it('returns 7 for architectural style chosen', () => {
+    expect(calculateCompletenessScore(makeInput({ approach: makeApproach('microservices') }))).toBe(7)
+  })
+
+  it('returns 0 for architectural style tbd', () => {
+    expect(calculateCompletenessScore(makeInput({ approach: makeApproach('tbd') }))).toBe(0)
+  })
+
+  it('returns 7 for 1+ patterns', () => {
+    expect(calculateCompletenessScore(makeInput({ patternCount: 1 }))).toBe(7)
+  })
+
+  it('returns 5 for 2+ tech choices', () => {
+    expect(calculateCompletenessScore(makeInput({ techChoiceCount: 2 }))).toBe(5)
+  })
+
+  it('returns 0 for 1 tech choice', () => {
+    expect(calculateCompletenessScore(makeInput({ techChoiceCount: 1 }))).toBe(0)
+  })
+
+  it('returns 5 for 2+ NFRs', () => {
+    expect(calculateCompletenessScore(makeInput({ nfrCount: 2 }))).toBe(5)
+  })
+
+  it('returns 4 for 1+ principles', () => {
+    expect(calculateCompletenessScore(makeInput({ principleCount: 1 }))).toBe(4)
+  })
+
+  it('returns 50 for all scope criteria met', () => {
     expect(calculateCompletenessScore(makeInput({
       scope: makeScope('Problem'),
       risks: [makeRisk(), makeRisk()],
@@ -111,6 +155,23 @@ describe('calculateCompletenessScore', () => {
       integrationPointCount: 1,
       constraintCount: 1,
     }))).toBe(50)
+  })
+
+  it('returns 78 for all criteria met', () => {
+    expect(calculateCompletenessScore(makeInput({
+      scope: makeScope('Problem'),
+      risks: [makeRisk(), makeRisk()],
+      inScopeItemCount: 3,
+      outOfScopeItemCount: 1,
+      stakeholderCount: 2,
+      integrationPointCount: 1,
+      constraintCount: 1,
+      approach: makeApproach('microservices'),
+      patternCount: 1,
+      techChoiceCount: 2,
+      nfrCount: 2,
+      principleCount: 1,
+    }))).toBe(78)
   })
 })
 

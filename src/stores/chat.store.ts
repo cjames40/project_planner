@@ -102,6 +102,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
       case 'constraint':
         await planStore.addConstraint(proposal.data)
         break
+      case 'pattern':
+        await planStore.addPattern(proposal.data)
+        break
+      case 'tech-choice':
+        await planStore.addTechChoice(proposal.data)
+        break
+      case 'nfr':
+        await planStore.addNFR(proposal.data)
+        break
+      case 'principle':
+        await planStore.addPrinciple(proposal.data)
+        break
     }
   },
 

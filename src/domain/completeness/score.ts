@@ -1,4 +1,4 @@
-import type { Scope, Risk } from '../types'
+import type { Scope, Risk, Approach } from '../types'
 
 export type CompletenessLabel = 'Early Draft' | 'In Progress' | 'Substantial' | 'Complete'
 export type CompletenessColor = 'gray' | 'amber' | 'blue' | 'green'
@@ -11,14 +11,21 @@ export interface CompletenessInput {
   stakeholderCount: number
   integrationPointCount: number
   constraintCount: number
+  approach: Approach | null
+  patternCount: number
+  techChoiceCount: number
+  nfrCount: number
+  principleCount: number
 }
 
 /**
- * Completeness score (0–50 for scope+risk criteria).
- * Remaining 50 comes from Approach/ADR tabs (not yet implemented).
+ * Completeness score (0–78 for scope+risk+approach criteria).
+ * Remaining 22 comes from ADR/Opportunity/TODO tabs (not yet implemented).
  */
 export function calculateCompletenessScore(input: CompletenessInput): number {
   let score = 0
+
+  // --- Scope criteria (50 pts) ---
 
   // Problem statement: 10 pts
   if (input.scope && input.scope.problemStatement.trim().length > 0) {
@@ -53,6 +60,33 @@ export function calculateCompletenessScore(input: CompletenessInput): number {
   // Constraints >= 1: 7 pts
   if (input.constraintCount >= 1) {
     score += 7
+  }
+
+  // --- Approach criteria (28 pts) ---
+
+  // Architectural style chosen (not 'tbd'): 7 pts
+  if (input.approach && input.approach.architecturalStyle !== 'tbd') {
+    score += 7
+  }
+
+  // Patterns >= 1: 7 pts
+  if (input.patternCount >= 1) {
+    score += 7
+  }
+
+  // Tech choices >= 2: 5 pts
+  if (input.techChoiceCount >= 2) {
+    score += 5
+  }
+
+  // NFRs >= 2: 5 pts
+  if (input.nfrCount >= 2) {
+    score += 5
+  }
+
+  // Principles >= 1: 4 pts
+  if (input.principleCount >= 1) {
+    score += 4
   }
 
   return score

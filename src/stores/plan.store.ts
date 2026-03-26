@@ -4,11 +4,15 @@ import type {
   InScopeItem, OutOfScopeItem, Stakeholder, IntegrationPoint, Constraint,
   CreateInScopeItemInput, CreateOutOfScopeItemInput, CreateStakeholderInput,
   CreateIntegrationPointInput, CreateConstraintInput,
+  Approach, UpdateApproachInput, ArchitecturalPattern, CreatePatternInput,
+  TechnologyChoice, CreateTechChoiceInput, NFR, CreateNFRInput,
+  Principle, CreatePrincipleInput,
 } from '@/domain/types'
 import {
   projectRepository, planRepository, scopeRepository, riskRepository,
   inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository,
   integrationPointRepository, constraintRepository,
+  approachRepository, patternRepository, techChoiceRepository, nfrRepository, principleRepository,
 } from '@/services/persistence'
 import { calculateCompletenessScore } from '@/domain/completeness/score'
 
@@ -22,6 +26,11 @@ interface PlanState {
   stakeholders: Stakeholder[]
   integrationPoints: IntegrationPoint[]
   constraints: Constraint[]
+  approach: Approach | null
+  patterns: ArchitecturalPattern[]
+  techChoices: TechnologyChoice[]
+  nfrs: NFR[]
+  principles: Principle[]
   completenessScore: number
   loading: boolean
 
@@ -39,6 +48,15 @@ interface PlanState {
   deleteIntegrationPoint: (id: string) => Promise<void>
   addConstraint: (input: CreateConstraintInput) => Promise<Constraint>
   deleteConstraint: (id: string) => Promise<void>
+  updateApproach: (input: UpdateApproachInput) => Promise<void>
+  addPattern: (input: CreatePatternInput) => Promise<ArchitecturalPattern>
+  deletePattern: (id: string) => Promise<void>
+  addTechChoice: (input: CreateTechChoiceInput) => Promise<TechnologyChoice>
+  deleteTechChoice: (id: string) => Promise<void>
+  addNFR: (input: CreateNFRInput) => Promise<NFR>
+  deleteNFR: (id: string) => Promise<void>
+  addPrinciple: (input: CreatePrincipleInput) => Promise<Principle>
+  deletePrinciple: (id: string) => Promise<void>
   reset: () => void
 }
 
@@ -51,6 +69,11 @@ function recalc(state: PlanState): number {
     stakeholderCount: state.stakeholders.length,
     integrationPointCount: state.integrationPoints.length,
     constraintCount: state.constraints.length,
+    approach: state.approach,
+    patternCount: state.patterns.length,
+    techChoiceCount: state.techChoices.length,
+    nfrCount: state.nfrs.length,
+    principleCount: state.principles.length,
   })
 }
 
@@ -64,6 +87,11 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   stakeholders: [],
   integrationPoints: [],
   constraints: [],
+  approach: null,
+  patterns: [],
+  techChoices: [],
+  nfrs: [],
+  principles: [],
   completenessScore: 0,
   loading: false,
 
@@ -73,6 +101,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const plan = await planRepository.getByProjectId(projectId)
     const scope = await scopeRepository.getByPlanId(plan.id)
     const risks = await riskRepository.listByPlanId(plan.id)
+    const approach = await approachRepository.getByPlanId(plan.id)
 
     let inScopeItems: InScopeItem[] = []
     let outOfScopeItems: OutOfScopeItem[] = []
@@ -90,7 +119,25 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       ])
     }
 
-    const newState = { project, plan, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, loading: false, completenessScore: 0 }
+    let patterns: ArchitecturalPattern[] = []
+    let techChoices: TechnologyChoice[] = []
+    let nfrs: NFR[] = []
+    let principles: Principle[] = []
+
+    if (approach) {
+      ;[patterns, techChoices, nfrs, principles] = await Promise.all([
+        patternRepository.listByApproachId(approach.id),
+        techChoiceRepository.listByApproachId(approach.id),
+        nfrRepository.listByApproachId(approach.id),
+        principleRepository.listByApproachId(approach.id),
+      ])
+    }
+
+    const newState = {
+      project, plan, scope, risks, inScopeItems, outOfScopeItems, stakeholders,
+      integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles,
+      loading: false, completenessScore: 0,
+    }
     newState.completenessScore = calculateCompletenessScore({
       scope, risks,
       inScopeItemCount: inScopeItems.length,
@@ -98,6 +145,11 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       stakeholderCount: stakeholders.length,
       integrationPointCount: integrationPoints.length,
       constraintCount: constraints.length,
+      approach,
+      patternCount: patterns.length,
+      techChoiceCount: techChoices.length,
+      nfrCount: nfrs.length,
+      principleCount: principles.length,
     })
     set(newState)
   },
@@ -212,11 +264,88 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     set({ completenessScore: recalc({ ...get(), constraints }) })
   },
 
+  async updateApproach(input) {
+    const { plan } = get()
+    if (!plan) return
+    const approach = await approachRepository.update(plan.id, input)
+    set({ approach })
+    set({ completenessScore: recalc({ ...get(), approach }) })
+  },
+
+  async addPattern(input) {
+    const { approach } = get()
+    if (!approach) throw new Error('No approach loaded')
+    const item = await patternRepository.create(approach.id, input)
+    const patterns = [...get().patterns, item]
+    set({ patterns })
+    set({ completenessScore: recalc({ ...get(), patterns }) })
+    return item
+  },
+
+  async deletePattern(id) {
+    await patternRepository.delete(id)
+    const patterns = get().patterns.filter((i) => i.id !== id)
+    set({ patterns })
+    set({ completenessScore: recalc({ ...get(), patterns }) })
+  },
+
+  async addTechChoice(input) {
+    const { approach } = get()
+    if (!approach) throw new Error('No approach loaded')
+    const item = await techChoiceRepository.create(approach.id, input)
+    const techChoices = [...get().techChoices, item]
+    set({ techChoices })
+    set({ completenessScore: recalc({ ...get(), techChoices }) })
+    return item
+  },
+
+  async deleteTechChoice(id) {
+    await techChoiceRepository.delete(id)
+    const techChoices = get().techChoices.filter((i) => i.id !== id)
+    set({ techChoices })
+    set({ completenessScore: recalc({ ...get(), techChoices }) })
+  },
+
+  async addNFR(input) {
+    const { approach } = get()
+    if (!approach) throw new Error('No approach loaded')
+    const item = await nfrRepository.create(approach.id, input)
+    const nfrs = [...get().nfrs, item]
+    set({ nfrs })
+    set({ completenessScore: recalc({ ...get(), nfrs }) })
+    return item
+  },
+
+  async deleteNFR(id) {
+    await nfrRepository.delete(id)
+    const nfrs = get().nfrs.filter((i) => i.id !== id)
+    set({ nfrs })
+    set({ completenessScore: recalc({ ...get(), nfrs }) })
+  },
+
+  async addPrinciple(input) {
+    const { approach } = get()
+    if (!approach) throw new Error('No approach loaded')
+    const item = await principleRepository.create(approach.id, input)
+    const principles = [...get().principles, item]
+    set({ principles })
+    set({ completenessScore: recalc({ ...get(), principles }) })
+    return item
+  },
+
+  async deletePrinciple(id) {
+    await principleRepository.delete(id)
+    const principles = get().principles.filter((i) => i.id !== id)
+    set({ principles })
+    set({ completenessScore: recalc({ ...get(), principles }) })
+  },
+
   reset() {
     set({
       project: null, plan: null, scope: null, risks: [],
       inScopeItems: [], outOfScopeItems: [], stakeholders: [],
       integrationPoints: [], constraints: [],
+      approach: null, patterns: [], techChoices: [], nfrs: [], principles: [],
       completenessScore: 0, loading: false,
     })
   },

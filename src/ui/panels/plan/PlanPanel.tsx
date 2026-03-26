@@ -2,6 +2,7 @@ import { useUIStore } from '@/stores'
 import { OverviewTab } from './tabs/OverviewTab'
 import { ScopeTab } from './tabs/ScopeTab'
 import { RisksTab } from './tabs/RisksTab'
+import { ApproachTab } from './tabs/ApproachTab'
 import { PlaceholderTab } from './tabs/PlaceholderTab'
 
 const TABS = [
@@ -39,7 +40,7 @@ export function PlanPanel() {
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'scope' && <ScopeTab />}
         {activeTab === 'risks' && <RisksTab />}
-        {activeTab === 'approach' && <PlaceholderTab name="Approach" />}
+        {activeTab === 'approach' && <ApproachTab />}
         {activeTab === 'opportunities' && <PlaceholderTab name="Opportunities" />}
         {activeTab === 'adrs' && <PlaceholderTab name="ADRs" />}
         {activeTab === 'todos' && <PlaceholderTab name="TODOs" />}

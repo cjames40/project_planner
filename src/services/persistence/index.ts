@@ -1,2 +1,2 @@
 export { initializeDatabase, getDatabase, persistDatabase } from './database'
-export { projectRepository, planRepository, scopeRepository, riskRepository, chatRepository, inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository, integrationPointRepository, constraintRepository } from './repositories'
+export { projectRepository, planRepository, scopeRepository, riskRepository, chatRepository, inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository, integrationPointRepository, constraintRepository, approachRepository, patternRepository, techChoiceRepository, nfrRepository, principleRepository } from './repositories'

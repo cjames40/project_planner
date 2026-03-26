@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import { getDatabase, persistDatabase } from '../database'
-import { plans, scopes } from '../schema'
+import { plans, scopes, approaches } from '../schema'
 import type { Plan } from '@/domain/types'
 
 function now(): string {
@@ -32,6 +32,16 @@ export const planRepository = {
         problemStatement: '',
         solutionSummary: '',
         assumptions: '[]',
+        createdAt: ts,
+        updatedAt: ts,
+      }).run()
+
+      db.insert(approaches).values({
+        id: uuidv4(),
+        planId,
+        strategySummary: '',
+        architecturalStyle: 'tbd',
+        architecturalStyleRationale: '',
         createdAt: ts,
         updatedAt: ts,
       }).run()

@@ -5,7 +5,7 @@ import { Badge } from '@/ui/components/Badge'
 import { PROJECT_TYPE_LABELS } from '@/domain/types'
 
 export function OverviewTab() {
-  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, completenessScore } = usePlanStore()
+  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles, completenessScore } = usePlanStore()
   const setActiveTab = useUIStore((s) => s.setActiveTab)
   const label = getCompletenessLabel(completenessScore)
 
@@ -16,6 +16,11 @@ export function OverviewTab() {
   const hasEnoughStakeholders = stakeholders.length >= 2
   const hasIntegrationPoint = integrationPoints.length >= 1
   const hasConstraint = constraints.length >= 1
+  const hasArchStyle = approach && approach.architecturalStyle !== 'tbd'
+  const hasPattern = patterns.length >= 1
+  const hasEnoughTechChoices = techChoices.length >= 2
+  const hasEnoughNFRs = nfrs.length >= 2
+  const hasPrinciple = principles.length >= 1
 
   const items = [
     { done: hasProblemStatement, label: 'Problem Statement', sub: hasProblemStatement ? 'Defined' : 'Not yet defined', tab: 'scope' as const },
@@ -25,6 +30,11 @@ export function OverviewTab() {
     { done: hasEnoughStakeholders, label: 'Stakeholders', sub: `${stakeholders.length} stakeholder${stakeholders.length !== 1 ? 's' : ''}${!hasEnoughStakeholders ? ' — need at least 2' : ''}`, tab: 'scope' as const },
     { done: hasIntegrationPoint, label: 'Integration Points', sub: `${integrationPoints.length} point${integrationPoints.length !== 1 ? 's' : ''}${!hasIntegrationPoint ? ' — need at least 1' : ''}`, tab: 'scope' as const },
     { done: hasConstraint, label: 'Constraints', sub: `${constraints.length} constraint${constraints.length !== 1 ? 's' : ''}${!hasConstraint ? ' — need at least 1' : ''}`, tab: 'scope' as const },
+    { done: hasArchStyle, label: 'Architectural Style', sub: hasArchStyle ? 'Selected' : 'Not yet selected', tab: 'approach' as const },
+    { done: hasPattern, label: 'Architectural Patterns', sub: `${patterns.length} pattern${patterns.length !== 1 ? 's' : ''}${!hasPattern ? ' — need at least 1' : ''}`, tab: 'approach' as const },
+    { done: hasEnoughTechChoices, label: 'Technology Choices', sub: `${techChoices.length} choice${techChoices.length !== 1 ? 's' : ''}${!hasEnoughTechChoices ? ' — need at least 2' : ''}`, tab: 'approach' as const },
+    { done: hasEnoughNFRs, label: 'Non-Functional Requirements', sub: `${nfrs.length} NFR${nfrs.length !== 1 ? 's' : ''}${!hasEnoughNFRs ? ' — need at least 2' : ''}`, tab: 'approach' as const },
+    { done: hasPrinciple, label: 'Design Principles', sub: `${principles.length} principle${principles.length !== 1 ? 's' : ''}${!hasPrinciple ? ' — need at least 1' : ''}`, tab: 'approach' as const },
   ]
 
   return (

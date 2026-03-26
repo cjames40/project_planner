@@ -194,6 +194,92 @@ export async function initializeDatabase(): Promise<DrizzleSqlJsDb<typeof schema
   `)
 
   rawDb.run(`
+    CREATE TABLE IF NOT EXISTS approaches (
+      id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL,
+      strategy_summary TEXT NOT NULL DEFAULT '',
+      architectural_style TEXT NOT NULL DEFAULT 'tbd',
+      architectural_style_rationale TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS architectural_patterns (
+      id TEXT PRIMARY KEY,
+      approach_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL,
+      applicable_components TEXT NOT NULL DEFAULT '[]',
+      tradeoffs TEXT NOT NULL,
+      alternatives TEXT NOT NULL DEFAULT '',
+      linked_adr_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS technology_choices (
+      id TEXT PRIMARY KEY,
+      approach_id TEXT NOT NULL,
+      category TEXT NOT NULL,
+      name TEXT NOT NULL,
+      rationale TEXT NOT NULL,
+      alternatives_considered TEXT NOT NULL DEFAULT '[]',
+      linked_adr_id TEXT NOT NULL DEFAULT '',
+      linked_constraint_ids TEXT NOT NULL DEFAULT '[]',
+      linked_nfr_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS nfrs (
+      id TEXT PRIMARY KEY,
+      approach_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL,
+      description TEXT NOT NULL,
+      target TEXT NOT NULL,
+      rationale TEXT NOT NULL,
+      verification_approach TEXT NOT NULL DEFAULT '',
+      priority TEXT NOT NULL,
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      linked_constraint_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
+    CREATE TABLE IF NOT EXISTS principles (
+      id TEXT PRIMARY KEY,
+      approach_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      rationale TEXT NOT NULL DEFAULT '',
+      implications TEXT NOT NULL DEFAULT '',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id TEXT PRIMARY KEY,
       plan_id TEXT NOT NULL,

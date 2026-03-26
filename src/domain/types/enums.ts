@@ -121,3 +121,51 @@ export const DATA_CLASSIFICATION_LABELS: Record<DataClassification, string> = {
   confidential: 'Confidential',
   restricted: 'Restricted',
 }
+
+export const ARCHITECTURAL_STYLE_LABELS: Record<ArchitecturalStyle, string> = {
+  monolith: 'Monolith',
+  'modular-monolith': 'Modular Monolith',
+  microservices: 'Microservices',
+  'event-driven': 'Event-Driven',
+  serverless: 'Serverless',
+  layered: 'Layered',
+  hexagonal: 'Hexagonal',
+  'pipe-and-filter': 'Pipe and Filter',
+  'space-based': 'Space-Based',
+  mixed: 'Mixed',
+  tbd: 'TBD',
+}
+
+export const NFR_CATEGORY_LABELS: Record<NFRCategory, string> = {
+  performance: 'Performance',
+  availability: 'Availability',
+  scalability: 'Scalability',
+  security: 'Security',
+  maintainability: 'Maintainability',
+  observability: 'Observability',
+  portability: 'Portability',
+  compliance: 'Compliance',
+  cost: 'Cost',
+  usability: 'Usability',
+  'disaster-recovery': 'Disaster Recovery',
+  other: 'Other',
+}
+
+export const MOSCOW_PRIORITY_LABELS: Record<MoSCoWPriority, string> = {
+  must: 'Must',
+  should: 'Should',
+  could: 'Could',
+}
+
+export const TECHNOLOGY_CATEGORY_LABELS: Record<TechnologyCategory, string> = {
+  language: 'Language',
+  framework: 'Framework',
+  database: 'Database',
+  messaging: 'Messaging',
+  infrastructure: 'Infrastructure',
+  observability: 'Observability',
+  security: 'Security',
+  devops: 'DevOps',
+  testing: 'Testing',
+  other: 'Other',
+}

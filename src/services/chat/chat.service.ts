@@ -4,6 +4,7 @@ import type { ChatMessage, ProposedElement } from '@/domain/types'
 import {
   proposeRiskSchema, proposeInScopeItemSchema, proposeOutOfScopeItemSchema,
   proposeStakeholderSchema, proposeIntegrationPointSchema, proposeConstraintSchema,
+  proposePatternSchema, proposeTechChoiceSchema, proposeNFRSchema, proposePrincipleSchema,
 } from './extraction-schema'
 import { buildSystemPrompt } from './system-prompt'
 import { useProjectStore } from '@/stores/project.store'
@@ -112,6 +113,38 @@ export async function streamChatMessage(
         execute: async (args) => {
           proposals.push({ type: 'constraint', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
           return { success: true, message: `Constraint proposed: ${args.title}` }
+        },
+      }),
+      proposePattern: tool({
+        description: 'Propose an architectural pattern to use in this project (e.g., CQRS, Saga, BFF).',
+        parameters: proposePatternSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'pattern', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Pattern proposed: ${args.name}` }
+        },
+      }),
+      proposeTechChoice: tool({
+        description: 'Propose a technology choice for the project (language, framework, database, etc.).',
+        parameters: proposeTechChoiceSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'tech-choice', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Technology choice proposed: ${args.name}` }
+        },
+      }),
+      proposeNFR: tool({
+        description: 'Propose a non-functional requirement with a measurable target.',
+        parameters: proposeNFRSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'nfr', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `NFR proposed: ${args.title}` }
+        },
+      }),
+      proposePrinciple: tool({
+        description: 'Propose a design principle that should guide architectural decisions.',
+        parameters: proposePrincipleSchema,
+        execute: async (args) => {
+          proposals.push({ type: 'principle', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Principle proposed: ${args.title}` }
         },
       }),
     },

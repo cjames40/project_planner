@@ -4,6 +4,7 @@ import type {
   MessageRole, ExtractionStatus, ElementType,
   InScopeCategory, ConstraintType, StakeholderType, InfluenceLevel, InterestLevel,
   IntegrationDirection, DataClassification, Criticality, IntegrationPointStatus,
+  ArchitecturalStyle, NFRCategory, MoSCoWPriority, TechnologyCategory,
 } from './enums'
 
 // --- Base fields shared by most entities ---
@@ -254,6 +255,153 @@ export interface UpdateConstraintInput {
   linkedStakeholderIds?: string[]
 }
 
+// --- Approach ---
+
+export interface Approach {
+  id: string
+  planId: string
+  strategySummary: string
+  architecturalStyle: ArchitecturalStyle
+  architecturalStyleRationale: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UpdateApproachInput {
+  strategySummary?: string
+  architecturalStyle?: ArchitecturalStyle
+  architecturalStyleRationale?: string
+}
+
+// --- ArchitecturalPattern ---
+
+export interface ArchitecturalPattern extends BaseEntity {
+  approachId: string
+  name: string
+  description: string
+  applicableComponents: string[]
+  tradeoffs: string
+  alternatives: string
+  linkedADRIds: string[]
+}
+
+export interface CreatePatternInput {
+  name: string
+  description: string
+  tradeoffs: string
+  applicableComponents?: string[]
+  alternatives?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdatePatternInput {
+  name?: string
+  description?: string
+  tradeoffs?: string
+  applicableComponents?: string[]
+  alternatives?: string
+  linkedADRIds?: string[]
+}
+
+// --- TechnologyChoice ---
+
+export interface AlternativeOption {
+  name: string
+  rejectionReason: string
+}
+
+export interface TechnologyChoice extends BaseEntity {
+  approachId: string
+  category: TechnologyCategory
+  name: string
+  rationale: string
+  alternativesConsidered: AlternativeOption[]
+  linkedADRId: string
+  linkedConstraintIds: string[]
+  linkedNFRIds: string[]
+}
+
+export interface CreateTechChoiceInput {
+  category: TechnologyCategory
+  name: string
+  rationale: string
+  alternativesConsidered?: AlternativeOption[]
+  createdVia: CreatedVia
+}
+
+export interface UpdateTechChoiceInput {
+  category?: TechnologyCategory
+  name?: string
+  rationale?: string
+  alternativesConsidered?: AlternativeOption[]
+  linkedADRId?: string
+  linkedConstraintIds?: string[]
+  linkedNFRIds?: string[]
+}
+
+// --- NFR ---
+
+export interface NFR extends BaseEntity {
+  approachId: string
+  title: string
+  category: NFRCategory
+  description: string
+  target: string
+  rationale: string
+  verificationApproach: string
+  priority: MoSCoWPriority
+  linkedRiskIds: string[]
+  linkedConstraintIds: string[]
+}
+
+export interface CreateNFRInput {
+  title: string
+  category: NFRCategory
+  description: string
+  target: string
+  rationale: string
+  priority: MoSCoWPriority
+  verificationApproach?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateNFRInput {
+  title?: string
+  category?: NFRCategory
+  description?: string
+  target?: string
+  rationale?: string
+  verificationApproach?: string
+  priority?: MoSCoWPriority
+  linkedRiskIds?: string[]
+  linkedConstraintIds?: string[]
+}
+
+// --- Principle ---
+
+export interface Principle extends BaseEntity {
+  approachId: string
+  title: string
+  description: string
+  rationale: string
+  implications: string
+}
+
+export interface CreatePrincipleInput {
+  title: string
+  description: string
+  rationale?: string
+  implications?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdatePrincipleInput {
+  title?: string
+  description?: string
+  rationale?: string
+  implications?: string
+}
+
 // --- Risk ---
 
 export interface Risk extends BaseEntity {
@@ -380,6 +528,30 @@ export interface ProposedConstraint {
   status: 'pending' | 'accepted' | 'rejected' | 'editing'
 }
 
+export interface ProposedPattern {
+  type: 'pattern'
+  data: CreatePatternInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedTechChoice {
+  type: 'tech-choice'
+  data: CreateTechChoiceInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedNFR {
+  type: 'nfr'
+  data: CreateNFRInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
+export interface ProposedPrinciple {
+  type: 'principle'
+  data: CreatePrincipleInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
 export type ProposedElement =
   | ProposedRisk
   | ProposedInScopeItem
@@ -387,3 +559,7 @@ export type ProposedElement =
   | ProposedStakeholder
   | ProposedIntegrationPoint
   | ProposedConstraint
+  | ProposedPattern
+  | ProposedTechChoice
+  | ProposedNFR
+  | ProposedPrinciple

@@ -51,3 +51,38 @@ export const proposeConstraintSchema = z.object({
   isNegotiable: z.boolean().describe('Whether this can be challenged with sufficient justification'),
   impact: z.string().describe('How this constraint affects the solution space'),
 })
+
+export const proposePatternSchema = z.object({
+  name: z.string().describe('Pattern name, e.g., "CQRS", "Saga", "BFF"'),
+  description: z.string().describe('What this pattern does and how it applies to this project'),
+  tradeoffs: z.string().describe('Key tradeoffs of using this pattern (pros and cons)'),
+  applicableComponents: z.array(z.string()).optional().describe('Which components or services this pattern applies to'),
+  alternatives: z.string().optional().describe('Alternative patterns that were considered'),
+})
+
+export const proposeTechChoiceSchema = z.object({
+  category: z.enum(['language', 'framework', 'database', 'messaging', 'infrastructure', 'observability', 'security', 'devops', 'testing', 'other']).describe('Technology category'),
+  name: z.string().describe('Technology name, e.g., "PostgreSQL", "Kubernetes", "TypeScript"'),
+  rationale: z.string().describe('Why this technology was chosen over alternatives'),
+  alternativesConsidered: z.array(z.object({
+    name: z.string().describe('Alternative technology name'),
+    rejectionReason: z.string().describe('Why this alternative was not chosen'),
+  })).optional().describe('Alternatives that were evaluated'),
+})
+
+export const proposeNFRSchema = z.object({
+  title: z.string().describe('Short name, e.g., "API Response Time"'),
+  category: z.enum(['performance', 'availability', 'scalability', 'security', 'maintainability', 'observability', 'portability', 'compliance', 'cost', 'usability', 'disaster-recovery', 'other']).describe('NFR category'),
+  description: z.string().describe('What this requirement means in the context of this project'),
+  target: z.string().describe('Measurable target, e.g., "P99 latency < 200ms"'),
+  rationale: z.string().describe('Why this NFR matters for the project'),
+  priority: z.enum(['must', 'should', 'could']).describe('MoSCoW priority'),
+  verificationApproach: z.string().optional().describe('How this NFR will be tested or verified'),
+})
+
+export const proposePrincipleSchema = z.object({
+  title: z.string().describe('Short name, e.g., "API-First Design"'),
+  description: z.string().describe('What this principle means and how it guides decisions'),
+  rationale: z.string().optional().describe('Why this principle was adopted'),
+  implications: z.string().optional().describe('What this principle means in practice — what teams must/must not do'),
+})
