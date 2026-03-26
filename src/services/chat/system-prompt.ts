@@ -19,6 +19,7 @@ Available tools — use them when you identify concrete elements:
 - **proposeTechChoice**: When a technology decision is made or recommended (language, framework, database, etc.)
 - **proposeNFR**: When a non-functional requirement is identified with a measurable target
 - **proposePrinciple**: When a design principle should guide decisions (e.g., API-First, eventual consistency)
+- **proposeOpportunity**: When a technical improvement opportunity is identified beyond the core scope (e.g., modernization, performance gains, cost reduction)
 
 ${problemStatement ? `Current problem statement:\n${problemStatement}\n` : 'No problem statement defined yet. Help the user articulate what problem this project solves.'}
 

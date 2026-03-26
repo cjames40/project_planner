@@ -63,6 +63,7 @@ function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInpu
     techChoiceCount: 0,
     nfrCount: 0,
     principleCount: 0,
+    opportunityCount: 0,
     ...overrides,
   }
 }
@@ -145,6 +146,11 @@ describe('calculateCompletenessScore', () => {
     expect(calculateCompletenessScore(makeInput({ principleCount: 1 }))).toBe(4)
   })
 
+  // Opportunity criteria
+  it('returns 4 for 1+ opportunities', () => {
+    expect(calculateCompletenessScore(makeInput({ opportunityCount: 1 }))).toBe(4)
+  })
+
   it('returns 50 for all scope criteria met', () => {
     expect(calculateCompletenessScore(makeInput({
       scope: makeScope('Problem'),
@@ -157,7 +163,7 @@ describe('calculateCompletenessScore', () => {
     }))).toBe(50)
   })
 
-  it('returns 78 for all criteria met', () => {
+  it('returns 82 for all criteria met', () => {
     expect(calculateCompletenessScore(makeInput({
       scope: makeScope('Problem'),
       risks: [makeRisk(), makeRisk()],
@@ -171,7 +177,8 @@ describe('calculateCompletenessScore', () => {
       techChoiceCount: 2,
       nfrCount: 2,
       principleCount: 1,
-    }))).toBe(78)
+      opportunityCount: 1,
+    }))).toBe(82)
   })
 })
 

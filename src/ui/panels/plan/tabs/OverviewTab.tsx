@@ -5,7 +5,7 @@ import { Badge } from '@/ui/components/Badge'
 import { PROJECT_TYPE_LABELS } from '@/domain/types'
 
 export function OverviewTab() {
-  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles, completenessScore } = usePlanStore()
+  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles, opportunities, completenessScore } = usePlanStore()
   const setActiveTab = useUIStore((s) => s.setActiveTab)
   const label = getCompletenessLabel(completenessScore)
 
@@ -21,6 +21,7 @@ export function OverviewTab() {
   const hasEnoughTechChoices = techChoices.length >= 2
   const hasEnoughNFRs = nfrs.length >= 2
   const hasPrinciple = principles.length >= 1
+  const hasOpportunity = opportunities.length >= 1
 
   const items = [
     { done: hasProblemStatement, label: 'Problem Statement', sub: hasProblemStatement ? 'Defined' : 'Not yet defined', tab: 'scope' as const },
@@ -35,6 +36,7 @@ export function OverviewTab() {
     { done: hasEnoughTechChoices, label: 'Technology Choices', sub: `${techChoices.length} choice${techChoices.length !== 1 ? 's' : ''}${!hasEnoughTechChoices ? ' — need at least 2' : ''}`, tab: 'approach' as const },
     { done: hasEnoughNFRs, label: 'Non-Functional Requirements', sub: `${nfrs.length} NFR${nfrs.length !== 1 ? 's' : ''}${!hasEnoughNFRs ? ' — need at least 2' : ''}`, tab: 'approach' as const },
     { done: hasPrinciple, label: 'Design Principles', sub: `${principles.length} principle${principles.length !== 1 ? 's' : ''}${!hasPrinciple ? ' — need at least 1' : ''}`, tab: 'approach' as const },
+    { done: hasOpportunity, label: 'Opportunities', sub: `${opportunities.length} opportunit${opportunities.length !== 1 ? 'ies' : 'y'}${!hasOpportunity ? ' — need at least 1' : ''}`, tab: 'opportunities' as const },
   ]
 
   return (

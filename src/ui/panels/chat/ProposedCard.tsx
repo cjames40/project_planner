@@ -19,6 +19,7 @@ const TYPE_LABELS: Record<ProposedElement['type'], string> = {
   'tech-choice': 'Technology Choice',
   'nfr': 'NFR',
   'principle': 'Design Principle',
+  'opportunity': 'Opportunity',
 }
 
 const TYPE_COLORS: Record<ProposedElement['type'], string> = {
@@ -32,6 +33,7 @@ const TYPE_COLORS: Record<ProposedElement['type'], string> = {
   'tech-choice': 'border-emerald-700/50 bg-emerald-950/20',
   'nfr': 'border-rose-700/50 bg-rose-950/20',
   'principle': 'border-teal-700/50 bg-teal-950/20',
+  'opportunity': 'border-lime-700/50 bg-lime-950/20',
 }
 
 const LABEL_COLORS: Record<ProposedElement['type'], string> = {
@@ -45,6 +47,7 @@ const LABEL_COLORS: Record<ProposedElement['type'], string> = {
   'tech-choice': 'text-emerald-400',
   'nfr': 'text-rose-400',
   'principle': 'text-teal-400',
+  'opportunity': 'text-lime-400',
 }
 
 export function ProposedCard({ proposal, index }: Props) {
@@ -189,6 +192,20 @@ function ProposalContent({ proposal }: { proposal: ProposedElement }) {
               <span className="font-medium text-zinc-400">Rationale:</span> {proposal.data.rationale}
             </p>
           )}
+        </>
+      )
+    case 'opportunity':
+      return (
+        <>
+          <h4 className="mb-1 text-sm font-medium text-zinc-100">{proposal.data.title}</h4>
+          <p className="text-xs text-zinc-400">{proposal.data.description}</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            <span className="font-medium text-zinc-400">Value:</span> {proposal.data.valueStatement}
+          </p>
+          <div className="mt-1 flex gap-1">
+            <Badge label={proposal.data.category} color="green" />
+            {proposal.data.effortEstimate && <Badge label={proposal.data.effortEstimate} color="gray" />}
+          </div>
         </>
       )
   }

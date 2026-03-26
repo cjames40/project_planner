@@ -280,6 +280,28 @@ export async function initializeDatabase(): Promise<DrizzleSqlJsDb<typeof schema
   `)
 
   rawDb.run(`
+    CREATE TABLE IF NOT EXISTS opportunities (
+      id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT NOT NULL,
+      effort_estimate TEXT NOT NULL DEFAULT '',
+      value_statement TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'identified',
+      status_rationale TEXT NOT NULL DEFAULT '',
+      prerequisites TEXT NOT NULL DEFAULT '',
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      linked_stakeholder_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id TEXT PRIMARY KEY,
       plan_id TEXT NOT NULL,

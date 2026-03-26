@@ -169,3 +169,30 @@ export const TECHNOLOGY_CATEGORY_LABELS: Record<TechnologyCategory, string> = {
   testing: 'Testing',
   other: 'Other',
 }
+
+export const OPPORTUNITY_CATEGORY_LABELS: Record<OpportunityCategory, string> = {
+  modernization: 'Modernization',
+  'performance-improvement': 'Performance Improvement',
+  'cost-reduction': 'Cost Reduction',
+  'developer-experience': 'Developer Experience',
+  'security-improvement': 'Security Improvement',
+  scalability: 'Scalability',
+  'technical-debt-reduction': 'Technical Debt Reduction',
+  'strategic-capability': 'Strategic Capability',
+  other: 'Other',
+}
+
+export const OPPORTUNITY_STATUS_LABELS: Record<OpportunityStatus, string> = {
+  identified: 'Identified',
+  'under-consideration': 'Under Consideration',
+  accepted: 'Accepted',
+  deferred: 'Deferred',
+  rejected: 'Rejected',
+}
+
+export const EFFORT_ESTIMATE_LABELS: Record<EffortEstimate, string> = {
+  days: 'Days',
+  weeks: 'Weeks',
+  months: 'Months',
+  quarters: 'Quarters',
+}

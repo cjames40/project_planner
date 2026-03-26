@@ -5,6 +5,7 @@ import {
   proposeRiskSchema, proposeInScopeItemSchema, proposeOutOfScopeItemSchema,
   proposeStakeholderSchema, proposeIntegrationPointSchema, proposeConstraintSchema,
   proposePatternSchema, proposeTechChoiceSchema, proposeNFRSchema, proposePrincipleSchema,
+  proposeOpportunitySchema,
 } from './extraction-schema'
 import { buildSystemPrompt } from './system-prompt'
 import { useProjectStore } from '@/stores/project.store'
@@ -145,6 +146,14 @@ export async function streamChatMessage(
         execute: async (args) => {
           proposals.push({ type: 'principle', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
           return { success: true, message: `Principle proposed: ${args.title}` }
+        },
+      }),
+      proposeOpportunity: tool({
+        description: 'Propose a technical improvement opportunity beyond the core scope (e.g., modernization, performance, cost reduction).',
+        parameters: proposeOpportunitySchema,
+        execute: async (args) => {
+          proposals.push({ type: 'opportunity', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `Opportunity proposed: ${args.title}` }
         },
       }),
     },

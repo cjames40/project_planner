@@ -114,6 +114,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       case 'principle':
         await planStore.addPrinciple(proposal.data)
         break
+      case 'opportunity':
+        await planStore.addOpportunity(proposal.data)
+        break
     }
   },
 

@@ -16,11 +16,12 @@ export interface CompletenessInput {
   techChoiceCount: number
   nfrCount: number
   principleCount: number
+  opportunityCount: number
 }
 
 /**
- * Completeness score (0–78 for scope+risk+approach criteria).
- * Remaining 22 comes from ADR/Opportunity/TODO tabs (not yet implemented).
+ * Completeness score (0–82 for scope+risk+approach+opportunity criteria).
+ * Remaining 18 comes from ADR/TODO tabs (not yet implemented).
  */
 export function calculateCompletenessScore(input: CompletenessInput): number {
   let score = 0
@@ -86,6 +87,13 @@ export function calculateCompletenessScore(input: CompletenessInput): number {
 
   // Principles >= 1: 4 pts
   if (input.principleCount >= 1) {
+    score += 4
+  }
+
+  // --- Opportunity criteria (4 pts) ---
+
+  // Opportunities >= 1: 4 pts
+  if (input.opportunityCount >= 1) {
     score += 4
   }
 

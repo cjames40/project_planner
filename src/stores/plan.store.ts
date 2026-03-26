@@ -7,12 +7,14 @@ import type {
   Approach, UpdateApproachInput, ArchitecturalPattern, CreatePatternInput,
   TechnologyChoice, CreateTechChoiceInput, NFR, CreateNFRInput,
   Principle, CreatePrincipleInput,
+  Opportunity, CreateOpportunityInput,
 } from '@/domain/types'
 import {
   projectRepository, planRepository, scopeRepository, riskRepository,
   inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository,
   integrationPointRepository, constraintRepository,
   approachRepository, patternRepository, techChoiceRepository, nfrRepository, principleRepository,
+  opportunityRepository,
 } from '@/services/persistence'
 import { calculateCompletenessScore } from '@/domain/completeness/score'
 
@@ -31,6 +33,7 @@ interface PlanState {
   techChoices: TechnologyChoice[]
   nfrs: NFR[]
   principles: Principle[]
+  opportunities: Opportunity[]
   completenessScore: number
   loading: boolean
 
@@ -57,6 +60,8 @@ interface PlanState {
   deleteNFR: (id: string) => Promise<void>
   addPrinciple: (input: CreatePrincipleInput) => Promise<Principle>
   deletePrinciple: (id: string) => Promise<void>
+  addOpportunity: (input: CreateOpportunityInput) => Promise<Opportunity>
+  deleteOpportunity: (id: string) => Promise<void>
   reset: () => void
 }
 
@@ -74,6 +79,7 @@ function recalc(state: PlanState): number {
     techChoiceCount: state.techChoices.length,
     nfrCount: state.nfrs.length,
     principleCount: state.principles.length,
+    opportunityCount: state.opportunities.length,
   })
 }
 
@@ -92,6 +98,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   techChoices: [],
   nfrs: [],
   principles: [],
+  opportunities: [],
   completenessScore: 0,
   loading: false,
 
@@ -101,6 +108,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const plan = await planRepository.getByProjectId(projectId)
     const scope = await scopeRepository.getByPlanId(plan.id)
     const risks = await riskRepository.listByPlanId(plan.id)
+    const opportunities = await opportunityRepository.listByPlanId(plan.id)
     const approach = await approachRepository.getByPlanId(plan.id)
 
     let inScopeItems: InScopeItem[] = []
@@ -134,7 +142,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     }
 
     const newState = {
-      project, plan, scope, risks, inScopeItems, outOfScopeItems, stakeholders,
+      project, plan, scope, risks, opportunities, inScopeItems, outOfScopeItems, stakeholders,
       integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles,
       loading: false, completenessScore: 0,
     }
@@ -150,6 +158,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       techChoiceCount: techChoices.length,
       nfrCount: nfrs.length,
       principleCount: principles.length,
+      opportunityCount: opportunities.length,
     })
     set(newState)
   },
@@ -340,12 +349,30 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     set({ completenessScore: recalc({ ...get(), principles }) })
   },
 
+  async addOpportunity(input) {
+    const { plan } = get()
+    if (!plan) throw new Error('No plan loaded')
+    const item = await opportunityRepository.create(plan.id, input)
+    const opportunities = [...get().opportunities, item]
+    set({ opportunities })
+    set({ completenessScore: recalc({ ...get(), opportunities }) })
+    return item
+  },
+
+  async deleteOpportunity(id) {
+    await opportunityRepository.delete(id)
+    const opportunities = get().opportunities.filter((i) => i.id !== id)
+    set({ opportunities })
+    set({ completenessScore: recalc({ ...get(), opportunities }) })
+  },
+
   reset() {
     set({
       project: null, plan: null, scope: null, risks: [],
       inScopeItems: [], outOfScopeItems: [], stakeholders: [],
       integrationPoints: [], constraints: [],
       approach: null, patterns: [], techChoices: [], nfrs: [], principles: [],
+      opportunities: [],
       completenessScore: 0, loading: false,
     })
   },

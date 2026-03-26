@@ -86,3 +86,12 @@ export const proposePrincipleSchema = z.object({
   rationale: z.string().optional().describe('Why this principle was adopted'),
   implications: z.string().optional().describe('What this principle means in practice — what teams must/must not do'),
 })
+
+export const proposeOpportunitySchema = z.object({
+  title: z.string().describe('Short label for the opportunity'),
+  description: z.string().describe('What the opportunity is and how it could be realized'),
+  category: z.enum(['modernization', 'performance-improvement', 'cost-reduction', 'developer-experience', 'security-improvement', 'scalability', 'technical-debt-reduction', 'strategic-capability', 'other']).describe('Opportunity category'),
+  valueStatement: z.string().describe('Concrete description of the value if realized'),
+  effortEstimate: z.enum(['days', 'weeks', 'months', 'quarters']).optional().describe('Rough effort sizing'),
+  prerequisites: z.string().optional().describe('What must be true before this opportunity can be pursued'),
+})

@@ -5,6 +5,7 @@ import type {
   InScopeCategory, ConstraintType, StakeholderType, InfluenceLevel, InterestLevel,
   IntegrationDirection, DataClassification, Criticality, IntegrationPointStatus,
   ArchitecturalStyle, NFRCategory, MoSCoWPriority, TechnologyCategory,
+  OpportunityCategory, OpportunityStatus, EffortEstimate,
 } from './enums'
 
 // --- Base fields shared by most entities ---
@@ -458,6 +459,45 @@ export interface UpdateRiskInput {
   linkedStakeholderIds?: string[]
 }
 
+// --- Opportunity ---
+
+export interface Opportunity extends BaseEntity {
+  planId: string
+  title: string
+  description: string
+  category: OpportunityCategory
+  effortEstimate: EffortEstimate | ''
+  valueStatement: string
+  status: OpportunityStatus
+  statusRationale: string
+  prerequisites: string
+  linkedRiskIds: string[]
+  linkedStakeholderIds: string[]
+}
+
+export interface CreateOpportunityInput {
+  title: string
+  description: string
+  category: OpportunityCategory
+  valueStatement: string
+  effortEstimate?: EffortEstimate
+  prerequisites?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateOpportunityInput {
+  title?: string
+  description?: string
+  category?: OpportunityCategory
+  effortEstimate?: EffortEstimate
+  valueStatement?: string
+  status?: OpportunityStatus
+  statusRationale?: string
+  prerequisites?: string
+  linkedRiskIds?: string[]
+  linkedStakeholderIds?: string[]
+}
+
 // --- Chat ---
 
 export interface ElementRef {
@@ -552,6 +592,12 @@ export interface ProposedPrinciple {
   status: 'pending' | 'accepted' | 'rejected' | 'editing'
 }
 
+export interface ProposedOpportunity {
+  type: 'opportunity'
+  data: CreateOpportunityInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
 export type ProposedElement =
   | ProposedRisk
   | ProposedInScopeItem
@@ -563,3 +609,4 @@ export type ProposedElement =
   | ProposedTechChoice
   | ProposedNFR
   | ProposedPrinciple
+  | ProposedOpportunity
