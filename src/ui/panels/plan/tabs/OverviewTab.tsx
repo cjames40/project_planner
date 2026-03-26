@@ -1,9 +1,11 @@
 import { usePlanStore, useUIStore } from '@/stores'
 import { getCompletenessLabel } from '@/domain/completeness/score'
 import { CompletenessIndicator } from '@/ui/components/CompletenessIndicator'
+import { Badge } from '@/ui/components/Badge'
+import { PROJECT_TYPE_LABELS } from '@/domain/types'
 
 export function OverviewTab() {
-  const { scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, completenessScore } = usePlanStore()
+  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, completenessScore } = usePlanStore()
   const setActiveTab = useUIStore((s) => s.setActiveTab)
   const label = getCompletenessLabel(completenessScore)
 
@@ -27,6 +29,19 @@ export function OverviewTab() {
 
   return (
     <div className="space-y-6">
+      {project && (
+        <div className="rounded border border-zinc-700 bg-zinc-900 p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-zinc-100">{project.name}</h3>
+            <Badge label={PROJECT_TYPE_LABELS[project.projectType]} color="blue" />
+          </div>
+          <p className="text-sm text-zinc-400">{project.description}</p>
+          {project.clientOrOrg && (
+            <p className="mt-1 text-xs text-zinc-500">Client/Org: {project.clientOrOrg}</p>
+          )}
+        </div>
+      )}
+
       <div>
         <div className="mb-2 flex items-center gap-2">
           <CompletenessIndicator score={completenessScore} />

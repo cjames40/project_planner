@@ -1,18 +1,19 @@
 import { create } from 'zustand'
 import type {
-  Plan, Scope, Risk, CreateRiskInput, UpdateScopeInput,
+  Project, Plan, Scope, Risk, CreateRiskInput, UpdateScopeInput,
   InScopeItem, OutOfScopeItem, Stakeholder, IntegrationPoint, Constraint,
   CreateInScopeItemInput, CreateOutOfScopeItemInput, CreateStakeholderInput,
   CreateIntegrationPointInput, CreateConstraintInput,
 } from '@/domain/types'
 import {
-  planRepository, scopeRepository, riskRepository,
+  projectRepository, planRepository, scopeRepository, riskRepository,
   inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository,
   integrationPointRepository, constraintRepository,
 } from '@/services/persistence'
 import { calculateCompletenessScore } from '@/domain/completeness/score'
 
 interface PlanState {
+  project: Project | null
   plan: Plan | null
   scope: Scope | null
   risks: Risk[]
@@ -54,6 +55,7 @@ function recalc(state: PlanState): number {
 }
 
 export const usePlanStore = create<PlanState>((set, get) => ({
+  project: null,
   plan: null,
   scope: null,
   risks: [],
@@ -67,6 +69,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
   async loadPlan(projectId) {
     set({ loading: true })
+    const project = await projectRepository.getById(projectId)
     const plan = await planRepository.getByProjectId(projectId)
     const scope = await scopeRepository.getByPlanId(plan.id)
     const risks = await riskRepository.listByPlanId(plan.id)
@@ -87,7 +90,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       ])
     }
 
-    const newState = { plan, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, loading: false, completenessScore: 0 }
+    const newState = { project, plan, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, loading: false, completenessScore: 0 }
     newState.completenessScore = calculateCompletenessScore({
       scope, risks,
       inScopeItemCount: inScopeItems.length,
@@ -211,7 +214,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
   reset() {
     set({
-      plan: null, scope: null, risks: [],
+      project: null, plan: null, scope: null, risks: [],
       inScopeItems: [], outOfScopeItems: [], stakeholders: [],
       integrationPoints: [], constraints: [],
       completenessScore: 0, loading: false,
