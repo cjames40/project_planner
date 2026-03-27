@@ -1,4 +1,4 @@
-import type { Scope, Risk, Approach } from '../types'
+import type { Scope, Risk, Approach, ADR } from '../types'
 
 export type CompletenessLabel = 'Early Draft' | 'In Progress' | 'Substantial' | 'Complete'
 export type CompletenessColor = 'gray' | 'amber' | 'blue' | 'green'
@@ -17,11 +17,12 @@ export interface CompletenessInput {
   nfrCount: number
   principleCount: number
   opportunityCount: number
+  adrs: ADR[]
 }
 
 /**
- * Completeness score (0–82 for scope+risk+approach+opportunity criteria).
- * Remaining 18 comes from ADR/TODO tabs (not yet implemented).
+ * Completeness score (0–97 for scope+risk+approach+opportunity+ADR criteria).
+ * Remaining 3 comes from future tabs.
  */
 export function calculateCompletenessScore(input: CompletenessInput): number {
   let score = 0
@@ -95,6 +96,18 @@ export function calculateCompletenessScore(input: CompletenessInput): number {
   // Opportunities >= 1: 4 pts
   if (input.opportunityCount >= 1) {
     score += 4
+  }
+
+  // --- ADR criteria (15 pts) ---
+
+  // At least 1 ADR: 10 pts
+  if (input.adrs.length >= 1) {
+    score += 10
+  }
+
+  // All ADRs have >= 2 options: 5 pts
+  if (input.adrs.length >= 1 && input.adrs.every((adr) => adr.options.length >= 2)) {
+    score += 5
   }
 
   return score

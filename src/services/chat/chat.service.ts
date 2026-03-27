@@ -6,6 +6,7 @@ import {
   proposeStakeholderSchema, proposeIntegrationPointSchema, proposeConstraintSchema,
   proposePatternSchema, proposeTechChoiceSchema, proposeNFRSchema, proposePrincipleSchema,
   proposeOpportunitySchema,
+  proposeADRSchema,
 } from './extraction-schema'
 import { buildSystemPrompt } from './system-prompt'
 import { useProjectStore } from '@/stores/project.store'
@@ -154,6 +155,15 @@ export async function streamChatMessage(
         execute: async (args) => {
           proposals.push({ type: 'opportunity', data: { ...args, createdVia: 'chat' as const }, status: 'pending' })
           return { success: true, message: `Opportunity proposed: ${args.title}` }
+        },
+      }),
+      proposeADR: tool({
+        description: 'Propose an Architecture Decision Record when a significant technical decision is being made or discussed. Include options with pros/cons when possible.',
+        parameters: proposeADRSchema,
+        execute: async (args) => {
+          const options = (args.options ?? []).map((o, i) => ({ ...o, id: `opt-${i}`, isChosen: false }))
+          proposals.push({ type: 'adr', data: { ...args, options, createdVia: 'chat' as const }, status: 'pending' })
+          return { success: true, message: `ADR proposed: ${args.title}` }
         },
       }),
     },

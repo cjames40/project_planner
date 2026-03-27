@@ -6,6 +6,7 @@ import type {
   IntegrationDirection, DataClassification, Criticality, IntegrationPointStatus,
   ArchitecturalStyle, NFRCategory, MoSCoWPriority, TechnologyCategory,
   OpportunityCategory, OpportunityStatus, EffortEstimate,
+  ADRStatus, ADRDriverType,
 } from './enums'
 
 // --- Base fields shared by most entities ---
@@ -498,6 +499,76 @@ export interface UpdateOpportunityInput {
   linkedStakeholderIds?: string[]
 }
 
+// --- ADR ---
+
+export interface ADROption {
+  id: string
+  title: string
+  description: string
+  pros: string[]
+  cons: string[]
+  isChosen: boolean
+}
+
+export interface ADR extends BaseEntity {
+  planId: string
+  sequenceNumber: number
+  title: string
+  status: ADRStatus
+  decisionDate: string
+  deciders: string[]
+  context: string
+  problemStatement: string
+  driverType: ADRDriverType
+  options: ADROption[]
+  decisionOutcome: string
+  decisionRationale: string
+  positiveConsequences: string[]
+  negativeConsequences: string[]
+  reviewTriggers: string[]
+  supersededById: string
+  supersedes: string[]
+  linkedConstraintIds: string[]
+  linkedNFRIds: string[]
+  linkedRiskIds: string[]
+  linkedOpportunityIds: string[]
+  linkedStakeholderIds: string[]
+}
+
+export interface CreateADRInput {
+  title: string
+  context: string
+  problemStatement: string
+  driverType: ADRDriverType
+  options?: ADROption[]
+  decisionOutcome?: string
+  decisionRationale?: string
+  createdVia: CreatedVia
+}
+
+export interface UpdateADRInput {
+  title?: string
+  status?: ADRStatus
+  decisionDate?: string
+  deciders?: string[]
+  context?: string
+  problemStatement?: string
+  driverType?: ADRDriverType
+  options?: ADROption[]
+  decisionOutcome?: string
+  decisionRationale?: string
+  positiveConsequences?: string[]
+  negativeConsequences?: string[]
+  reviewTriggers?: string[]
+  supersededById?: string
+  supersedes?: string[]
+  linkedConstraintIds?: string[]
+  linkedNFRIds?: string[]
+  linkedRiskIds?: string[]
+  linkedOpportunityIds?: string[]
+  linkedStakeholderIds?: string[]
+}
+
 // --- Chat ---
 
 export interface ElementRef {
@@ -598,6 +669,12 @@ export interface ProposedOpportunity {
   status: 'pending' | 'accepted' | 'rejected' | 'editing'
 }
 
+export interface ProposedADR {
+  type: 'adr'
+  data: CreateADRInput
+  status: 'pending' | 'accepted' | 'rejected' | 'editing'
+}
+
 export type ProposedElement =
   | ProposedRisk
   | ProposedInScopeItem
@@ -610,3 +687,4 @@ export type ProposedElement =
   | ProposedNFR
   | ProposedPrinciple
   | ProposedOpportunity
+  | ProposedADR

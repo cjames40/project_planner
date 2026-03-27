@@ -196,3 +196,20 @@ export const EFFORT_ESTIMATE_LABELS: Record<EffortEstimate, string> = {
   months: 'Months',
   quarters: 'Quarters',
 }
+
+export const ADR_STATUS_LABELS: Record<ADRStatus, string> = {
+  draft: 'Draft',
+  proposed: 'Proposed',
+  accepted: 'Accepted',
+  deprecated: 'Deprecated',
+  superseded: 'Superseded',
+}
+
+export const ADR_DRIVER_TYPE_LABELS: Record<ADRDriverType, string> = {
+  'constraint-driven': 'Constraint-Driven',
+  'nfr-driven': 'NFR-Driven',
+  'risk-driven': 'Risk-Driven',
+  'opportunity-driven': 'Opportunity-Driven',
+  'principle-driven': 'Principle-Driven',
+  'external-mandate': 'External Mandate',
+}

@@ -95,3 +95,18 @@ export const proposeOpportunitySchema = z.object({
   effortEstimate: z.enum(['days', 'weeks', 'months', 'quarters']).optional().describe('Rough effort sizing'),
   prerequisites: z.string().optional().describe('What must be true before this opportunity can be pursued'),
 })
+
+export const proposeADRSchema = z.object({
+  title: z.string().describe('Decision title, e.g., "Use PostgreSQL for primary datastore"'),
+  context: z.string().describe('Background context that frames this decision'),
+  problemStatement: z.string().describe('The specific problem or question this decision addresses'),
+  driverType: z.enum(['constraint-driven', 'nfr-driven', 'risk-driven', 'opportunity-driven', 'principle-driven', 'external-mandate']).describe('What is driving this decision'),
+  options: z.array(z.object({
+    title: z.string().describe('Option name'),
+    description: z.string().describe('Brief description of this option'),
+    pros: z.array(z.string()).describe('Advantages of this option'),
+    cons: z.array(z.string()).describe('Disadvantages of this option'),
+  })).optional().describe('Options considered for this decision'),
+  decisionOutcome: z.string().optional().describe('The chosen option, if decided'),
+  decisionRationale: z.string().optional().describe('Why this option was chosen'),
+})

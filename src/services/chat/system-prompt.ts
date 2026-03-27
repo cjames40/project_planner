@@ -20,6 +20,7 @@ Available tools — use them when you identify concrete elements:
 - **proposeNFR**: When a non-functional requirement is identified with a measurable target
 - **proposePrinciple**: When a design principle should guide decisions (e.g., API-First, eventual consistency)
 - **proposeOpportunity**: When a technical improvement opportunity is identified beyond the core scope (e.g., modernization, performance gains, cost reduction)
+- **proposeADR**: When a significant architectural decision is being made — include context, options with pros/cons, and rationale
 
 ${problemStatement ? `Current problem statement:\n${problemStatement}\n` : 'No problem statement defined yet. Help the user articulate what problem this project solves.'}
 

@@ -8,13 +8,14 @@ import type {
   TechnologyChoice, CreateTechChoiceInput, NFR, CreateNFRInput,
   Principle, CreatePrincipleInput,
   Opportunity, CreateOpportunityInput,
+  ADR, CreateADRInput,
 } from '@/domain/types'
 import {
   projectRepository, planRepository, scopeRepository, riskRepository,
   inScopeItemRepository, outOfScopeItemRepository, stakeholderRepository,
   integrationPointRepository, constraintRepository,
   approachRepository, patternRepository, techChoiceRepository, nfrRepository, principleRepository,
-  opportunityRepository,
+  opportunityRepository, adrRepository,
 } from '@/services/persistence'
 import { calculateCompletenessScore } from '@/domain/completeness/score'
 
@@ -34,6 +35,7 @@ interface PlanState {
   nfrs: NFR[]
   principles: Principle[]
   opportunities: Opportunity[]
+  adrs: ADR[]
   completenessScore: number
   loading: boolean
 
@@ -62,6 +64,8 @@ interface PlanState {
   deletePrinciple: (id: string) => Promise<void>
   addOpportunity: (input: CreateOpportunityInput) => Promise<Opportunity>
   deleteOpportunity: (id: string) => Promise<void>
+  addADR: (input: CreateADRInput) => Promise<ADR>
+  deleteADR: (id: string) => Promise<void>
   reset: () => void
 }
 
@@ -80,6 +84,7 @@ function recalc(state: PlanState): number {
     nfrCount: state.nfrs.length,
     principleCount: state.principles.length,
     opportunityCount: state.opportunities.length,
+    adrs: state.adrs,
   })
 }
 
@@ -99,6 +104,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   nfrs: [],
   principles: [],
   opportunities: [],
+  adrs: [],
   completenessScore: 0,
   loading: false,
 
@@ -109,6 +115,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const scope = await scopeRepository.getByPlanId(plan.id)
     const risks = await riskRepository.listByPlanId(plan.id)
     const opportunities = await opportunityRepository.listByPlanId(plan.id)
+    const adrs = await adrRepository.listByPlanId(plan.id)
     const approach = await approachRepository.getByPlanId(plan.id)
 
     let inScopeItems: InScopeItem[] = []
@@ -142,7 +149,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     }
 
     const newState = {
-      project, plan, scope, risks, opportunities, inScopeItems, outOfScopeItems, stakeholders,
+      project, plan, scope, risks, opportunities, adrs, inScopeItems, outOfScopeItems, stakeholders,
       integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles,
       loading: false, completenessScore: 0,
     }
@@ -159,6 +166,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       nfrCount: nfrs.length,
       principleCount: principles.length,
       opportunityCount: opportunities.length,
+      adrs,
     })
     set(newState)
   },
@@ -366,13 +374,30 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     set({ completenessScore: recalc({ ...get(), opportunities }) })
   },
 
+  async addADR(input) {
+    const { plan } = get()
+    if (!plan) throw new Error('No plan loaded')
+    const item = await adrRepository.create(plan.id, input)
+    const adrs = [...get().adrs, item]
+    set({ adrs })
+    set({ completenessScore: recalc({ ...get(), adrs }) })
+    return item
+  },
+
+  async deleteADR(id) {
+    await adrRepository.delete(id)
+    const adrs = get().adrs.filter((i) => i.id !== id)
+    set({ adrs })
+    set({ completenessScore: recalc({ ...get(), adrs }) })
+  },
+
   reset() {
     set({
       project: null, plan: null, scope: null, risks: [],
       inScopeItems: [], outOfScopeItems: [], stakeholders: [],
       integrationPoints: [], constraints: [],
       approach: null, patterns: [], techChoices: [], nfrs: [], principles: [],
-      opportunities: [],
+      opportunities: [], adrs: [],
       completenessScore: 0, loading: false,
     })
   },

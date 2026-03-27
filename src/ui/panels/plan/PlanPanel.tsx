@@ -4,6 +4,7 @@ import { ScopeTab } from './tabs/ScopeTab'
 import { RisksTab } from './tabs/RisksTab'
 import { ApproachTab } from './tabs/ApproachTab'
 import { OpportunitiesTab } from './tabs/OpportunitiesTab'
+import { ADRsTab } from './tabs/ADRsTab'
 import { PlaceholderTab } from './tabs/PlaceholderTab'
 
 const TABS = [
@@ -43,7 +44,7 @@ export function PlanPanel() {
         {activeTab === 'risks' && <RisksTab />}
         {activeTab === 'approach' && <ApproachTab />}
         {activeTab === 'opportunities' && <OpportunitiesTab />}
-        {activeTab === 'adrs' && <PlaceholderTab name="ADRs" />}
+        {activeTab === 'adrs' && <ADRsTab />}
         {activeTab === 'todos' && <PlaceholderTab name="TODOs" />}
       </div>
     </div>

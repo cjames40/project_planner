@@ -5,7 +5,7 @@ import { Badge } from '@/ui/components/Badge'
 import { PROJECT_TYPE_LABELS } from '@/domain/types'
 
 export function OverviewTab() {
-  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles, opportunities, completenessScore } = usePlanStore()
+  const { project, scope, risks, inScopeItems, outOfScopeItems, stakeholders, integrationPoints, constraints, approach, patterns, techChoices, nfrs, principles, opportunities, adrs, completenessScore } = usePlanStore()
   const setActiveTab = useUIStore((s) => s.setActiveTab)
   const label = getCompletenessLabel(completenessScore)
 
@@ -22,6 +22,8 @@ export function OverviewTab() {
   const hasEnoughNFRs = nfrs.length >= 2
   const hasPrinciple = principles.length >= 1
   const hasOpportunity = opportunities.length >= 1
+  const hasADR = adrs.length >= 1
+  const allADRsHaveOptions = adrs.length >= 1 && adrs.every((a) => a.options.length >= 2)
 
   const items = [
     { done: hasProblemStatement, label: 'Problem Statement', sub: hasProblemStatement ? 'Defined' : 'Not yet defined', tab: 'scope' as const },
@@ -37,6 +39,8 @@ export function OverviewTab() {
     { done: hasEnoughNFRs, label: 'Non-Functional Requirements', sub: `${nfrs.length} NFR${nfrs.length !== 1 ? 's' : ''}${!hasEnoughNFRs ? ' — need at least 2' : ''}`, tab: 'approach' as const },
     { done: hasPrinciple, label: 'Design Principles', sub: `${principles.length} principle${principles.length !== 1 ? 's' : ''}${!hasPrinciple ? ' — need at least 1' : ''}`, tab: 'approach' as const },
     { done: hasOpportunity, label: 'Opportunities', sub: `${opportunities.length} opportunit${opportunities.length !== 1 ? 'ies' : 'y'}${!hasOpportunity ? ' — need at least 1' : ''}`, tab: 'opportunities' as const },
+    { done: hasADR, label: 'Architecture Decisions', sub: `${adrs.length} ADR${adrs.length !== 1 ? 's' : ''}${!hasADR ? ' — need at least 1' : ''}`, tab: 'adrs' as const },
+    { done: allADRsHaveOptions, label: 'ADR Options Coverage', sub: allADRsHaveOptions ? 'All ADRs have 2+ options' : 'Each ADR should have at least 2 options considered', tab: 'adrs' as const },
   ]
 
   return (

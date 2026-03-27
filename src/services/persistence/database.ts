@@ -302,6 +302,39 @@ export async function initializeDatabase(): Promise<DrizzleSqlJsDb<typeof schema
   `)
 
   rawDb.run(`
+    CREATE TABLE IF NOT EXISTS adrs (
+      id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL,
+      sequence_number INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'draft',
+      decision_date TEXT NOT NULL DEFAULT '',
+      deciders TEXT NOT NULL DEFAULT '[]',
+      context TEXT NOT NULL,
+      problem_statement TEXT NOT NULL,
+      driver_type TEXT NOT NULL,
+      options TEXT NOT NULL DEFAULT '[]',
+      decision_outcome TEXT NOT NULL DEFAULT '',
+      decision_rationale TEXT NOT NULL DEFAULT '',
+      positive_consequences TEXT NOT NULL DEFAULT '[]',
+      negative_consequences TEXT NOT NULL DEFAULT '[]',
+      review_triggers TEXT NOT NULL DEFAULT '[]',
+      superseded_by_id TEXT NOT NULL DEFAULT '',
+      supersedes TEXT NOT NULL DEFAULT '[]',
+      linked_constraint_ids TEXT NOT NULL DEFAULT '[]',
+      linked_nfr_ids TEXT NOT NULL DEFAULT '[]',
+      linked_risk_ids TEXT NOT NULL DEFAULT '[]',
+      linked_opportunity_ids TEXT NOT NULL DEFAULT '[]',
+      linked_stakeholder_ids TEXT NOT NULL DEFAULT '[]',
+      created_via TEXT NOT NULL DEFAULT 'manual',
+      tags TEXT NOT NULL DEFAULT '[]',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  rawDb.run(`
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id TEXT PRIMARY KEY,
       plan_id TEXT NOT NULL,

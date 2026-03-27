@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calculateCompletenessScore, getCompletenessLabel, getCompletenessColor, type CompletenessInput } from '../completeness/score'
-import type { Scope, Risk, Approach } from '../types'
+import type { Scope, Risk, Approach, ADR } from '../types'
 
 const makeScope = (problemStatement: string): Scope => ({
   id: '1',
@@ -49,6 +49,44 @@ const makeApproach = (style: Approach['architecturalStyle'] = 'microservices'): 
   updatedAt: '',
 })
 
+const makeADR = (optionCount = 0): ADR => ({
+  id: '1',
+  planId: 'p1',
+  sequenceNumber: 1,
+  title: 'ADR-001',
+  status: 'draft',
+  decisionDate: '',
+  deciders: [],
+  context: 'Context',
+  problemStatement: 'Problem',
+  driverType: 'constraint-driven',
+  options: Array.from({ length: optionCount }, (_, i) => ({
+    id: `opt-${i}`,
+    title: `Option ${i}`,
+    description: '',
+    pros: [],
+    cons: [],
+    isChosen: false,
+  })),
+  decisionOutcome: '',
+  decisionRationale: '',
+  positiveConsequences: [],
+  negativeConsequences: [],
+  reviewTriggers: [],
+  supersededById: '',
+  supersedes: [],
+  linkedConstraintIds: [],
+  linkedNFRIds: [],
+  linkedRiskIds: [],
+  linkedOpportunityIds: [],
+  linkedStakeholderIds: [],
+  createdVia: 'manual',
+  tags: [],
+  notes: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInput {
   return {
     scope: null,
@@ -64,6 +102,7 @@ function makeInput(overrides: Partial<CompletenessInput> = {}): CompletenessInpu
     nfrCount: 0,
     principleCount: 0,
     opportunityCount: 0,
+    adrs: [],
     ...overrides,
   }
 }
@@ -151,6 +190,19 @@ describe('calculateCompletenessScore', () => {
     expect(calculateCompletenessScore(makeInput({ opportunityCount: 1 }))).toBe(4)
   })
 
+  // ADR criteria
+  it('returns 10 for 1+ ADRs', () => {
+    expect(calculateCompletenessScore(makeInput({ adrs: [makeADR(0)] }))).toBe(10)
+  })
+
+  it('returns 15 for 1+ ADRs all with 2+ options', () => {
+    expect(calculateCompletenessScore(makeInput({ adrs: [makeADR(2)] }))).toBe(15)
+  })
+
+  it('returns 10 for ADRs where not all have 2+ options', () => {
+    expect(calculateCompletenessScore(makeInput({ adrs: [makeADR(2), makeADR(1)] }))).toBe(10)
+  })
+
   it('returns 50 for all scope criteria met', () => {
     expect(calculateCompletenessScore(makeInput({
       scope: makeScope('Problem'),
@@ -163,7 +215,7 @@ describe('calculateCompletenessScore', () => {
     }))).toBe(50)
   })
 
-  it('returns 82 for all criteria met', () => {
+  it('returns 97 for all criteria met', () => {
     expect(calculateCompletenessScore(makeInput({
       scope: makeScope('Problem'),
       risks: [makeRisk(), makeRisk()],
@@ -178,7 +230,8 @@ describe('calculateCompletenessScore', () => {
       nfrCount: 2,
       principleCount: 1,
       opportunityCount: 1,
-    }))).toBe(82)
+      adrs: [makeADR(2)],
+    }))).toBe(97)
   })
 })
 
